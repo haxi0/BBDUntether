@@ -9,7 +9,7 @@
 ```
 *__Bye Bye Dock Untethered for iOS 14 - 16__*
 
-**Modified by haxi0 to be used with [CVE-2022-46689](https://support.apple.com/en-us/HT213530) overwrite stuff. More like a PoC for developers to use for their apps.**
+**Modified by haxi0 to be used with [CVE-2022-46689](https://support.apple.com/en-us/HT213530) overwrite stuff. More like a PoC for developers to use for their MDC apps.**
 # Compatibility is not guaranteed, USE AT YOUR OWN RISK!
 ## Building
 1. Get decrypted TestFlight ipa
