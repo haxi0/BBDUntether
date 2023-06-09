@@ -1,12 +1,14 @@
 ```
-    ___________ __  __      __       __  __             
-   / ____/ ___// / / /___  / /____  / /_/ /_  ___  _____
-  / /_   \__ \/ / / / __ \/ __/ _ \/ __/ __ \/ _ \/ ___/
- / __/  ___/ / /_/ / / / / /_/  __/ /_/ / / /  __/ /    
-/_/    /____/\____/_/ /_/\__/\___/\__/_/ /_/\___/_/        
-                    by Ingan121
+  ____  ____  _____  _    _       _       _   _               
+ |  _ \|  _ \|  __ \| |  | |     | |     | | | |              
+ | |_) | |_) | |  | | |  | |_ __ | |_ ___| |_| |__   ___ _ __ 
+ |  _ <|  _ <| |  | | |  | | '_ \| __/ _ \ __| '_ \ / _ \ '__|
+ | |_) | |_) | |__| | |__| | | | | ||  __/ |_| | | |  __/ |   
+ |____/|____/|_____/ \____/|_| |_|\__\___|\__|_| |_|\___|_|                                                   
+           by haxi0, original PoC by Ingan121
 ```
-*__Fucking Simple Untethered code execution PoC for iOS 15, 16, and 17__*
+*__Bye Bye Dock Untethered for iOS 15 and 16__*
+**Modified by haxi0 to be used with [CVE-2022-46689](https://support.apple.com/en-us/HT213530) overwrite stuff**
 # Compatibility is not guaranteed, USE AT YOUR OWN RISK!
 ## Building
 1. Get decrypted TestFlight ipa
@@ -16,14 +18,17 @@
   * You'll need a paid certificate to retain the original `com.apple.TestFlight` bundle ID, if you're not using TrollStore.
   * FSUntether currently doesn't work if the bundle ID is changed.
 5. Disable USB restricted mode, connect your phone to your Mac or PC, then reboot the device 
-6. Run `iproxy 1338 1338` and `nc localhost 1338` in separate terminals
+6. ~~Run `iproxy 1338 1338` and `nc localhost 1338` in separate terminals~~ 
 * TestFlight app will crash on launch, but the untether will work fine.
 * Tested versions and devices:
   * iPhone Xs: 15.1, 15.4.1
   * iPad Pro 12.9 6th gen: 16.1.1, 16.3.1, 16.4, 16.4.1, 16.5, 17.0DB1
   * iPhone 14 Pro Max: 16.1.2
+  * iPhone 14: 16.1.1
   * On 14.3 (Xs), `TestFlightServiceExtension` starts a few seconds after the first unlock, so there's no BFU code execution. (But there are [Fugu14](https://github.com/LinusHenze/Fugu14) and [permasigning haxx](https://github.com/asdfugil/haxx) that work BFU on 14, you know.)
   * Versions below 13 are not tested. Note that the latest TestFlight requires iOS 14 or later. I don't even know if `TestFlightServiceExtension` exists on TestFlight for iOS 13 and below.
+
+The rest of the README is not modified to work with BBDUntether
   
 ## How does this work
 * `TestFlightServiceExtension` of `TestFlight.app` automatically starts on boot, even before first unlock. That's all `¯\_(ツ)_/¯`
