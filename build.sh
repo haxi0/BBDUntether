@@ -5,17 +5,24 @@ printf "   / ____/ ___// / / /___  / /____  / /_/ /_  ___  _____\n"
 printf "  / /_   \\__ \\/ / / / __ \\/ __/ _ \\/ __/ __ \\/ _ \\/ ___/\n"
 printf " / __/  ___/ / /_/ / / / / /_/  __/ /_/ / / /  __/ /    \n"
 printf "/_/    /____/\\____/_/ /_/\\__/\\___/\\__/_/ /_/\\___/_/     \n"
-printf "                      by Ingan121\n"
+printf "                 by Ingan121, mod by haxi0\n"
 printf "\n\n"
-echo "Fucking Simple Untethered code execution PoC for iOS 15, 16, and 17"
+echo "Fucking Simple Untethered code execution PoC for iOS 15, 16, and 17. Modified to be easly changed and used for other purposes."
 echo "Untether is fully supported on iOS 15, 16, and 17 with BFU code execution."
 echo "  (AFU code execution is supported on iOS 14)"
+echo "Developer note: See lines 137, 138 and 142"
 echo "Unsandboxing method varies per version; please see the options below.\n"
 
 echo Preparing...
 rm -rf "${0:A:h}/build"
 mkdir "${0:A:h}/build"
 cd "${0:A:h}/build"
+
+if [[ ! -n $(ldid 2>&1 1>/dev/null | grep procursus) ]] then
+    echo Procursus ldid is not installed!
+    echo Please install it from https://github.com/permasigner/ldid/releases!
+    exit -1
+fi
 
 if [[ ! -a ~/theos/sdks/iPhoneOS14.5.sdk ]]; then
     echo "Required theos SDK is not installed, installing..."
@@ -37,6 +44,10 @@ unzip ../TestFlight.ipa > /dev/null
 TFS=Payload/TestFlight.app/Frameworks/TestFlightServices.framework/TestFlightServices
 TFSE=Payload/TestFlight.app/PlugIns/TestFlightServiceExtension.appex/TestFlightServiceExtension
 INFOPLIST=Payload/TestFlight.app/Info.plist
+ASSETS=Payload/TestFlight.app/Assets.car
+APPICON60=Payload/TestFlight.app/AppIcon60x60@2x.png
+APPICON76=Payload/TestFlight.app/AppIcon76x76@2x~ipad.png
+CURRENTDIR=$(pwd)
 
 if type otool > /dev/null; then
     if [[ $(otool -l $TFSE | grep cryptid) = *"cryptid 1"* ]]; then
@@ -60,10 +71,9 @@ echo "  * Supported versions: 15.0-15.7.1, 16.0-16.1.2 (14 and below are NOT sup
 echo "4) Sandboxed code execution (no filesystem access; untether only)"
 echo "  * Supported versions: 15.0-17.0DB1 (AFU supported on 14)\n"
 vared -p "Selection: " -c CHOICE
-echo
 
 if [[ $CHOICE == 1 ]]; then
-    if [[ ! $(xcode-select -p) = *"Xcode.app"* ]]; then
+    if [[ ! $(xcode-select -p) = *"Xcode.app"* ]] then
         echo Xcode is not installed or active developer directory is a command line tools instance!
         echo Please install or xcode-select Xcode!
         cd -
@@ -78,68 +88,69 @@ else
     fi
 fi
 
-if [[ $CHOICE == 1 || $CHOICE == 2 ]]; then
-    if [[ ! -n $(ldid 2>&1 1>/dev/null | grep procursus) ]]; then
-        echo Procursus ldid is not installed!
-        echo Please install it from https://github.com/ProcursusTeam/ldid
-        exit -1
-    fi
-fi
-
 if [[ $CHOICE == 1 ]]; then
-    echo "Building iDownload and AutoLauncher..."
+    echo "\nBuilding iDownload and AutoLauncher..."
     cd ../iDownload
-    clang -arch arm64 -isysroot ~/theos/sdks/iPhoneOS14.5.sdk -o TestFlightServices autolauncher.c -framework CoreFoundation -framework SpringBoardServices -F ~/theos/sdks/iPhoneOS14.5.sdk/System/Library/PrivateFrameworks -dynamiclib
+    clang -arch arm64 -isysroot ~/theos/sdks/iPhoneOS14.5.sdk -o TestFlightServices autolauncher.c -framework CoreFoundation -framework SpringBoardServices -F ~/theos/sdks/iPhoneOS14.5.sdk/System/Library/PrivateFrameworks -dynamiclib -w
     clang -arch arm64 -isysroot ~/theos/sdks/iPhoneOS14.5.sdk -o ncserver server.c -framework CoreFoundation -framework SpringBoardServices -F ~/theos/sdks/iPhoneOS14.5.sdk/System/Library/PrivateFrameworks -w
     cd -
     
-    echo "\nBuilding FSUntetherGUI..."
+    echo "\nBuilding FSUntetherGUI (Fully unsandboxed)..."
     ../FSUntetherGUI/build.sh
     cp ../FSUntetherGUI/FSUntetherGUI.ipa .
     
     echo "\nBuilding FSUntether TestFlight..."
     cp ../iDownload/TestFlightServices $TFS
     ldid -e $TFSE > tfse.ent
-    cat tfse.ent | tail -r | tail -n +2 | tail -r | { echo "$(cat -)$(cat ../misc/plist_parts/ent_opensensitiveurl.txt)" } > tfse.ent
+    cat tfse.ent | tail -r | tail -n +3 | tail -r | { echo "$(cat -)$(cat $CURRENTDIR/../misc/plist_parts/ent_opensensitiveurl.txt)" } > tfse.ent
     ldid -Stfse.ent -K../misc/dev_certificate.p12 $TFSE
     zip -r FSUntether.ipa Payload > /dev/null
      
     echo "\nDone!"
     echo Please uninstall the original TestFlight first, then install FSUntetherGUI.ipa and FSUntether.ipa with TrollStore.
 elif [[ $CHOICE == 2 ]]; then
-    echo "Building iDownload..."
+    echo "\nBuilding iDownload..."
     cd ../iDownload
-    clang -arch arm64 -isysroot ~/theos/sdks/iPhoneOS14.5.sdk -o TestFlightServices server-dylib.m -framework CoreFoundation -framework SpringBoardServices -framework MobileCoreServices -framework Foundation -F ~/theos/sdks/iPhoneOS14.5.sdk/System/Library/PrivateFrameworks -dynamiclib
+    clang -arch arm64 -isysroot ~/theos/sdks/iPhoneOS14.5.sdk -o TestFlightServices server-dylib.c -framework CoreFoundation -framework SpringBoardServices -F ~/theos/sdks/iPhoneOS14.5.sdk/System/Library/PrivateFrameworks -dynamiclib -w
     cd -
     
-    echo "\nBuilding FSUntether TestFlight..."
+    echo "\nBuilding FSUntether TestFlight (Semi-unsandboxed)..."
     cp ../iDownload/TestFlightServices $TFS
     ldid -e $TFSE > tfse.ent
-    cat tfse.ent | tail -r | tail -n +2 | tail -r | { echo "$(cat -)$(cat ../misc/plist_parts/ent_semiunsandbox.txt)" } > tfse.ent
+    cat tfse.ent | tail -r | tail -n +3 | tail -r | { echo "$(cat -)$(cat $CURRENTDIR/../misc/plist_parts/ent_semiunsandbox.txt)" } > tfse.ent
     ldid -Stfse.ent -K../misc/dev_certificate.p12 $TFSE
     zip -r FSUntether.ipa Payload > /dev/null
     
     echo "\nDone!"
     echo Please uninstall the original TestFlight first, then install FSUntether.ipa with TrollStore.
 elif [[ $CHOICE == 3 ]]; then
-    echo "Building iDownload..."
+    echo "\nBuilding iDownload..."
     ../iDownload/build_mdc.sh
 
-    echo "\nBuilding FSUntether TestFlight..."
+    echo "\nBuilding FSUntether TestFlight (MacDirtyCow)..."
     cp ../iDownload/TestFlightServices $TFS
-    cat $INFOPLIST | tail -r | tail -n +2 | tail -r | { echo "$(cat -)$(cat ../misc/plist_parts/infoplist_fda.txt)" } > $INFOPLIST
-    zip -r FSUntether.ipa Payload > /dev/null
+    vared -p "Do you wish to use grant_full_disk_access? (y / Any other key)" -c DISKACCESS
+    if [[ $DISKACCESS == y ]]; then
+    echo "$(cat $INFOPLIST | tail -r | tail -n +3 | tail -r)" > $INFOPLIST
+    cat $CURRENTDIR/../misc/plist_parts/infoplist_fda.txt >> $INFOPLIST
+    fi
+
+    cp ../BBDAssets/BBDUntether.png $APPICON60 # Remove if building your own untether app
+    cp ../BBDAssets/BBDUntether.png $APPICON76 # Remove if building your own untether app
+    rm $ASSETS
+
+    zip -r FSUntether.ipa Payload > /dev/null # Remove if building your own untether app
 
     echo "\nDone!"
     echo Please uninstall the original TestFlight first, then sideload FSUntether.ipa.
     echo You must retain the original com.apple.TestFlight bundle ID.
 elif [[ $CHOICE == 4 ]]; then
-    echo "Building iDownload..."
+    echo "\nBuilding iDownload..."
     cd ../iDownload
-    clang -arch arm64 -isysroot ~/theos/sdks/iPhoneOS14.5.sdk -o TestFlightServices server-dylib.m -framework CoreFoundation -framework SpringBoardServices -framework MobileCoreServices -framework Foundation -F ~/theos/sdks/iPhoneOS14.5.sdk/System/Library/PrivateFrameworks -dynamiclib
+    clang -arch arm64 -isysroot ~/theos/sdks/iPhoneOS14.5.sdk -o TestFlightServices server-dylib.c -framework CoreFoundation -framework SpringBoardServices -F ~/theos/sdks/iPhoneOS14.5.sdk/System/Library/PrivateFrameworks -dynamiclib -w
     cd -
 
-    echo "\nBuilding FSUntether TestFlight..."
+    echo "\nBuilding FSUntether TestFlight (Sandboxed)..."
     cp ../iDownload/TestFlightServices $TFS
     zip -r FSUntether.ipa Payload > /dev/null
 
@@ -147,8 +158,7 @@ elif [[ $CHOICE == 4 ]]; then
     echo Please uninstall the original TestFlight first, then sideload FSUntether.ipa.
     echo You must retain the original com.apple.TestFlight bundle ID.
 else
-    echo Invalid selection!
-    echo Exiting...
+    echo "\nInvalid selection!\nExiting..."
 fi
 
 cd -
