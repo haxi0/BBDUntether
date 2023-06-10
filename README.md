@@ -7,7 +7,7 @@
  |____/|____/|_____/ \____/|_| |_|\__\___|\__|_| |_|\___|_|
            by haxi0, original PoC by Ingan121
 ```
-*__Bye Bye Dock Untethered for iOS 14 - 16. Basically removes dock background on boot__*
+*__Bye Bye Dock Untethered for iOS 14 - 16. Basically removes dock background a few seconds after boot__*
 
 **Modified by haxi0 to be used with [CVE-2022-46689](https://support.apple.com/en-us/HT213530) overwrite stuff. More like a PoC for developers to use for their MDC apps.**
 # Compatibility is not guaranteed, USE AT YOUR OWN RISK!
