@@ -31,11 +31,10 @@
 #include "Exploit/helpers.h"
 #include "Exploit/vm_unaligned_copy_switch_race.h"
 
-BOOL overwriteFileWithDataImpl(NSString *originPath, NSString *backupName, NSData *replacementData) { // cowabunga function converted to objc
+BOOL overwriteFileWithDataImpl(NSString *originPath, NSData *replacementData) { // cowabunga function converted to objc
 #if false
     NSString *documentDirectory = [NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) objectAtIndex:0];
     NSString *pathToRealTarget = originPath;
-    NSString *targetPath = [documentDirectory stringByAppendingPathComponent:backupName];
     NSData *origData = [NSData dataWithContentsOfFile:pathToRealTarget];
     [origData writeToFile:targetPath atomically:YES];
 #endif
@@ -94,19 +93,24 @@ BOOL overwriteFileWithDataImpl(NSString *originPath, NSString *backupName, NSDat
 }
 
 __attribute__((constructor))
-static int dylibMain() {
-    NSString *originalPath = @"/System/Library/PrivateFrameworks/CoreMaterial.framework/dockDark.materialrecipe";
-    NSString *backupName = @"dockDark";
+static void dylibMain() {
+    NSString *originalPathDark = @"/System/Library/PrivateFrameworks/CoreMaterial.framework/dockDark.materialrecipe";
+    NSString *originalPathLight = @"/System/Library/PrivateFrameworks/CoreMaterial.framework/dockLight.materialrecipe";
     NSData *randomData = [[NSMutableData dataWithLength:32] initWithBytes:(__bridge const void *)(NSMutableData * _Nonnull[]){ nil } length:32];
-
-    BOOL success = overwriteFileWithDataImpl(originalPath, backupName, randomData);
-    if (success) {
-        NSLog(@"File overwrite succeeded.");
-    } else {
-        NSLog(@"File overwrite failed.");
-    }
-
-    xpc_crasher("com.apple.frontboard.systemappservices");
     
-    return 0;
+    BOOL successDark = overwriteFileWithDataImpl(originalPathDark, randomData);
+    if (successDark) {
+        NSLog(@"Dark overwrite succeeded");
+    } else {
+        NSLog(@"Dark overwrite failed");
+    }
+    
+    BOOL successLight = overwriteFileWithDataImpl(originalPathLight, randomData);
+    if (successLight) {
+        NSLog(@"Light overwrite succeeded");
+    } else {
+        NSLog(@"Light overwrite failed");
+    }
+    
+    xpc_crasher("com.apple.frontboard.systemappservices");
 }
