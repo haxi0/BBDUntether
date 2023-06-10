@@ -66,7 +66,7 @@ echo "1) Fully unsandboxed code execution with CVE-2022-26766 (permasigning) and
 echo "  * Supported versions: 15.0-15.4.1, 15.5b1-b4, 15.6b1-b5 (AFU supported on 14)\n"
 echo "2) Semi-unsandboxed code execution (filesystem access only) with CVE-2022-26766 (permasigning)"
 echo "  * Supported versions: same as 1)\n"
-echo "3) Semi-unsandboxed code execution (filesystem access only) with CVE-2022-46689 (MacDirtyCow)"
+echo "3) Semi-unsandboxed code execution (filesystem access only) with CVE-2022-46689 (MacDirtyCow) **USE FOR BBDUNTETHER COMPILING!**"
 echo "  * Supported versions: 15.0-15.7.1, 16.0-16.1.2 (14 and below are NOT supported)\n"
 echo "4) Sandboxed code execution (no filesystem access; untether only)"
 echo "  * Supported versions: 15.0-17.0DB1 (AFU supported on 14)\n"

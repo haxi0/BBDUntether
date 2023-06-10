@@ -7,7 +7,7 @@
  |____/|____/|_____/ \____/|_| |_|\__\___|\__|_| |_|\___|_|
            by haxi0, original PoC by Ingan121
 ```
-*__Bye Bye Dock Untethered for iOS 14 - 16__*
+*__Bye Bye Dock Untethered for iOS 14 - 16. Basically removes dock background a few seconds after boot__*
 
 **Modified by haxi0 to be used with [CVE-2022-46689](https://support.apple.com/en-us/HT213530) overwrite stuff. More like a PoC for developers to use for their MDC apps.**
 # Compatibility is not guaranteed, USE AT YOUR OWN RISK!
@@ -15,11 +15,11 @@
 1. Get decrypted TestFlight ipa
 2. Rename it to TestFlight.ipa and place it in the same directory as `build.sh`
 3. Build FSUntether with `build.sh` in the root of the repository.
-4. Install the built IPAs as instructed by `build.sh`
+4. Install the built IPAs as instructed by `build.sh`, **your choose of selection on how to build the .iPA should be 3!**
   * You'll need a paid certificate to retain the original `com.apple.TestFlight` bundle ID, if you're not using TrollStore.
   * FSUntether currently doesn't work if the bundle ID is changed.
-5. Disable USB restricted mode, connect your phone to your Mac or PC, then reboot the device 
-6. ~~Run `iproxy 1338 1338` and `nc localhost 1338` in separate terminals~~ 
+5. ~~Disable USB restricted mode, connect your phone to your Mac or PC, then reboot the device~~
+6. ~~Run `iproxy 1338 1338` and `nc localhost 1338` in separate terminals~~
 * TestFlight app will crash on launch, but the untether will work fine.
 * Tested versions and devices:
   * iPhone Xs: 15.1, 15.4.1
